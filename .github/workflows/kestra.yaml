@@ -18,7 +18,7 @@ jobs:
         with:
           directory: ./kestra/flows
           resource: flow
-          server: ttps://f634-4-240-39-195.ngrok-free.app
+          server: https://f634-4-240-39-195.ngrok-free.app
 
   # If validation passed, deploy resources
   deploy:
@@ -35,7 +35,7 @@ jobs:
           namespace: kestra.aiops
           directory: ./kestra/flows/product
           resource: flow
-          server: ttps://f634-4-240-39-195.ngrok-free.app
+          server: https://f634-4-240-39-195.ngrok-free.app
 
       - name: Deploy engineering flows
         uses: kestra-io/deploy-action@master
@@ -43,4 +43,4 @@ jobs:
           namespace: kestra.aiops
           directory: ./kestra/flows/engineering
           resource: flow
-          server: ttps://f634-4-240-39-195.ngrok-free.app
+          server: https://f634-4-240-39-195.ngrok-free.app
