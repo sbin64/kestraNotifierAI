@@ -1,6 +1,6 @@
 # Social Media Outreach and Wikisearch AI
 
-Social Media Outreach and Wikisearch AI Workflow is an AI-driven bot that integrates with Golang framework to automate social media and email outreach tasks. It uses AI to generate content, monitors trending topics in Golang, and sends posts to Twitter and emails to target recipients. The bot is built using Golang, GPT models, and various APIs for social media and email handling.
+Social Media Outreach and Wikisearch AI Workflow leverages Kestra's powerful workflow pipeline to automate and optimize social media outreach and wiki-based search tasks. Using AI, it streamlines the process of gathering, analysing, and sharing content across social media platforms while efficiently retrieving relevant information from wikis, enhancing engagement and content discovery.
 
 ![alt text](image.png)
 
