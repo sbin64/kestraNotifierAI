@@ -8,7 +8,7 @@ inputs:
     defaults: https://kestra.io
   - id: slack_webhook_uri
     type: URI
-    defaults: https://hooks.slack.com/services/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
+    defaults: "{{ kv('SLACK_WEBHOOK_URI') }}"
   - id: recipients
     type: STRING
     defaults: ["afvn.in@gmail.com"]
@@ -96,7 +96,6 @@ tasks:
       - "twitter_post.txt"
     script: |
       import google.generativeai as genai
-      import json
 
       # Configure Generative AI API key
       genai.configure(api_key="{{ inputs.gen_ai_api_key }}")
@@ -121,7 +120,7 @@ tasks:
         ),
       )
 
-      # Extract the generated post
+       # Extract the generated post
       twitter_post = response.text if response.candidates else "No content generated."
 
       # Save the generated post to a file
@@ -133,11 +132,8 @@ tasks:
     url: "{{ inputs.slack_webhook_uri }}"
     payload: |
       {
-        "alias": "Kestra Latest Update Released",
-        "avatar": "https://avatars.githubusercontent.com/u/59033362?s=48",
-        "emoji": ":smirk:",
         "channel": "#random",
-        "text": "New Kestra update released."
+        "text": "New Kestra update available: {{ read(outputs.create_kestra_updates_content.outputFiles['output.txt']) }}"
       }
 
   - id: send_email_notifications
@@ -158,15 +154,15 @@ tasks:
     type: io.kestra.plugin.core.log.Log
     message: "Process completed. Slack and email notifications sent."
     
-# errors:
-#   - id: server_unreachable
-#     type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
-#     url: "{{ inputs.slack_webhook_uri }}"
-#     payload: |
-#       {
-#         "channel": "#alerts",
-#         "text": "The server {{ inputs.server_uri }} is unreachable!"
-#       }
+errors:
+  - id: server_unreachable
+    type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
+    url: "{{ inputs.slack_webhook_uri }}"
+    payload: |
+      {
+        "channel": "#alerts",
+        "text": "The server {{ inputs.server_uri }} is unreachable!"
+      }
     
 triggers:
   - id: daily
