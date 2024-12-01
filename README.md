@@ -5,30 +5,14 @@ Social Media Outreach and Wikisearch AI Workflow is an AI-driven bot that integr
 ![alt text](image.png)
 
 
-## Project Structure
+## Pipeline Structure
 
-kestranotifierai/
-│
-├── main.go               # Entry point
-├── handlers/             # Handlers for routes
-│   ├── social.go         # Social media-related handlers
-│   ├── email.go          # Email outreach handlers
-├── utils/                # Utility functions
-│   ├── ai.go             # AI-related functions
-│   ├── trends.go         # Trend monitoring
-│   └── email.go          # Email API utilities
-├── config/               # Configuration files
-│   └── config.go         # Environment variables
-├── .env                  # API keys and secrets
-└── go.mod                # Go modules
 
 ## Technologies Used
 
 - **Golang Framework**: Route management and data handling
 - **GPT Model (e.g., GPT-4)**: Content generation and analysis
-- **Redis**: Caching and data storage
-- **Twitter API**: Post tweets on Twitter
-- **Mailgun API**: Send personalized emails to target recipients
+- **Kestra Workflow Engine**: Pipeline the deployment
 
 ## Setup
 
