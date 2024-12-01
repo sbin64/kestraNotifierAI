@@ -33,7 +33,7 @@ jobs:
         uses: kestra-io/deploy-action@master
         with:
           namespace: kestra.aiops
-          directory: ./kestra/flows/product
+          directory: ./kestra/flows
           resource: flow
           server: https://f634-4-240-39-195.ngrok-free.app
 
