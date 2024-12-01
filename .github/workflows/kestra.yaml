@@ -2,8 +2,8 @@ name: Kestra CI/CD
 on:
   push:
     branches: ["main"]
-  pull_requests:
-    branches: ["deploy"]
+  pull_request:
+    branches: ["main", "deploy"]
 
 jobs:
   validate:
