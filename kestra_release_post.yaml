@@ -133,7 +133,7 @@ tasks:
     payload: |
       {
         "channel": "#random",
-        "text": "New Kestra update available: {{ read(outputs.create_kestra_updates_content.outputFiles['output.txt']) }}"
+        "text": "New Kestra update now"
       }
 
   - id: send_email_notifications
@@ -154,15 +154,15 @@ tasks:
     type: io.kestra.plugin.core.log.Log
     message: "Process completed. Slack and email notifications sent."
     
-# errors:
-#   - id: server_unreachable
-#     type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
-#     url: "{{ inputs.slack_webhook_uri }}"
-#     payload: |
-#       {
-#         "channel": "#alerts",
-#         "text": "The server {{ inputs.server_uri }} is unreachable!"
-#       }
+errors:
+  - id: server_unreachable
+    type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
+    url: "{{ inputs.slack_webhook_uri }}"
+    payload: |
+      {
+        "channel": "#alerts",
+        "text": "The server {{ inputs.server_uri }} is unreachable!"
+      }
     
 triggers:
   - id: daily

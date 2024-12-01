@@ -7,6 +7,9 @@ Social Media Outreach and Wikisearch AI Workflow is an AI-driven bot that integr
 
 ## Pipeline Structure
 
+![alt text](image-2.png)
+social-media-workflow
+
 
 ## Technologies Used
 
@@ -19,23 +22,26 @@ Social Media Outreach and Wikisearch AI Workflow is an AI-driven bot that integr
 ### Prerequisites
 
 - Go (1.18+)
-- Docker (for Redis)
+- Docker (for Kestra Engine)
 - Ollama (for LLM model serving)
 - API keys for Twitter and Mailgun
-- Redis server running
+- Kestra Engine server running
 
 ### Running Locally
 
-1. **Run Redis**:
-   Use Docker to run Redis on port 2002:
+1. **Run Kestra Engine**:
+   Use Docker to run Kestra Engine on port 8080:
    ```bash
-   docker run --name gofr-redis -p 2002:6379 -d redis
+   docker run --pull=always --rm -it -p 8080:8080 --user=root -v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp kestra/kestra:latest server local
+   ```
 
 2. **Run Ollama**:
     `curl -fsSL https://ollama.com/install.sh | sh`
     `ollama serve`
 3. Run Kestra Workflow: Ensure that the necessary environment variables are set in .env (API keys and secrets), then run the bot server:
 The Kestra Workflow server will run on port 8080.
+
+![alt text](image-1.png)
 
 
 ## Contribution
