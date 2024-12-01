@@ -7,9 +7,10 @@ Social Media Outreach and Wikisearch AI Workflow is an AI-driven bot that integr
 
 ## Pipeline Structure
 
+### social-media-workflow
 ![alt text](image-2.png)
-social-media-workflow
 
+### 
 
 ## Technologies Used
 

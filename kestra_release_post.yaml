@@ -8,7 +8,7 @@ inputs:
     defaults: https://kestra.io
   - id: slack_webhook_uri
     type: URI
-    defaults: https://hooks.slack.com/services/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
+    defaults: "{{ kv('SLACK_WEBHOOK_URI') }}"
   - id: recipients
     type: STRING
     defaults: ["afvn.in@gmail.com"]
