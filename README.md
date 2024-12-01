@@ -1,6 +1,6 @@
-# GoFr Bot
+# Social Media Outreach AI
 
-GoFr Bot is an AI-driven bot that integrates with GoFr framework to automate social media and email outreach tasks. It uses AI to generate content, monitors trending topics in Golang, and sends posts to Twitter and emails to target recipients. The bot is built using GoFr, GPT models, and various APIs for social media and email handling.
+Social Media Outreach AI is an AI-driven bot that integrates with GoFr framework to automate social media and email outreach tasks. It uses AI to generate content, monitors trending topics in Golang, and sends posts to Twitter and emails to target recipients. The bot is built using GoFr, GPT models, and various APIs for social media and email handling.
 
 ![alt text](image.png)
 
