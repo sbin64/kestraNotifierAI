@@ -1,0 +1,92 @@
+id: wikisearch_with_genai
+namespace: kestra.aiops
+
+inputs:
+  - id: user_input
+    name: query
+    type: STRING
+    description: "Search your query on Wikipedia and summarize the results using Gemini. Enter a query to start."
+tasks:
+  - id: user_input
+    type: "io.kestra.plugin.core.debug.Echo"
+    format: |
+      {
+        "user_query": "{{ inputs.user_input }}"
+      }
+
+  - id: search_wikipedia
+    type: io.kestra.plugin.scripts.python.Script
+    containerImage: python:slim
+    beforeCommands:
+      - pip install wikipedia
+    outputFiles:
+      - "wiki_results.json"
+    script: |
+      import wikipedia
+      import json
+
+      # Get the user query from inputs
+      user_query = "{{ inputs.user_input }}"
+
+      # Function to search Wikipedia for a given query
+      def search_wikipedia(query, limit):
+          wikipedia.set_lang("en")
+          search_results = wikipedia.search(query, results=limit)
+          results = []
+          for title in search_results:
+              try:
+                  page = wikipedia.page(title)
+                  results.append({"url": page.url, "title": page.title, "text": page.summary})
+              except wikipedia.PageError:
+                  continue
+          return results
+
+      # Perform the search and save results
+      items = search_wikipedia(user_query, limit=3)
+      with open("wiki_results.json", "w") as file:
+          json.dump(items, file)
+
+  - id: summarize_results
+    type: io.kestra.plugin.scripts.python.Script
+    containerImage: python:slim
+    beforeCommands:
+      - pip install google-generativeai
+      - pip install wikipedia
+    outputFiles:
+      - "summary.txt"
+    script: |
+      import json
+      import google.generativeai as genai
+
+      # Configure Generative AI API key
+      genai.configure(api_key="{{ inputs.gen_ai_api_key }}")
+
+      # Load Wikipedia results
+      with open("wiki_results.json", "r") as file:
+          wiki_results = json.load(file)
+
+      # Initialize the Gemini model
+      model = genai.GenerativeModel("gemini-1.5-flash")
+
+      # Summarize the results
+      summaries = []
+      for item in wiki_results:
+          prompt = f"Summarize the following text:\n\n{item['text']}"
+          response = model.generate_content(
+              prompt,
+              generation_config=genai.types.GenerationConfig(
+                  candidate_count=1,
+                  stop_sequences=["x"],
+                  max_output_tokens=400,
+                  temperature=1.0,
+              ),
+          )
+          summary = response.text if response.candidates else "No summary generated."
+          summaries.append({"title": item['title'], "summary": summary, "url": item['url']})
+
+      # Save the summaries to a file
+      with open("summary.txt", "w") as file:
+          for entry in summaries:
+              file.write(f"Title: {entry['title']}\n")
+              file.write(f"Summary: {entry['summary']}\n")
+              file.write(f"URL: {entry['url']}\n\n")
