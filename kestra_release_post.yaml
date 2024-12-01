@@ -133,7 +133,7 @@ tasks:
     payload: |
       {
         "channel": "#random",
-        "text": "New Kestra update now"
+        "text": "New Kestra update available: {{ read(outputs.create_kestra_updates_content.outputFiles['output.txt']) }}"
       }
 
   - id: send_email_notifications
