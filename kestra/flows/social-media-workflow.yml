@@ -1,0 +1,124 @@
+id: social-media-workflow
+namespace: prod
+description: A workflow for social media posts, Slack alerts, and email notifications.
+
+inputs:
+  - id: server_uri
+    type: URI
+    defaults: https://kestra.io
+  - id: slack_webhook_uri
+    type: URI
+    defaults: "{{kv('SLACK_WEBHOOK')}}"
+  - id: recipients
+    type: STRING
+    defaults: ["afvn.in@gmail.com"]
+  - id: api_url
+    type: URI
+    defaults: https://api.github.com/repos/kestra-io/kestra/releases/latest
+
+tasks:
+  - id: fetch_kestra_github_api
+    type: io.kestra.plugin.core.http.Request
+    uri: '{{ inputs.api_url }}'
+    method: GET
+    headers:
+      Accept: application/vnd.github+json
+      X-GitHub-Api-Version: 2022-11-28
+      User-Agent: Awesome-Octocat-App
+    logLevel: INFO
+
+  - id: fetch_kestra_latest_updates
+    type: io.kestra.plugin.scripts.shell.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    containerImage: golang:latest
+    inputFiles:
+      main.go: |
+        package main
+
+        import (
+            "encoding/json"
+            "fmt"
+            "os"
+            "log"
+        )
+
+        type GitHubRelease struct {
+            TagName     string `json:"tag_name"`
+            Name        string `json:"name"`
+            Body        string `json:"body"`
+            PublishedAt string `json:"published_at"`
+        }
+
+        func main() {
+            // GitHub release JSON response passed from Kestra
+            var release GitHubRelease
+            err := json.Unmarshal([]byte(os.Getenv("KESTRA_RELEASES_BODY")), &release)
+            if err != nil {
+                log.Fatal(err)
+            }
+
+            // Format the release information
+            kestra := release
+            postContent := fmt.Sprintf("Latest Kestra Release:\nTag: %s\nName: %s\nPublished: %s\n\n%s",
+                kestra.TagName, kestra.Name, kestra.PublishedAt, kestra.Body)
+
+            // Write to output file
+            err = os.WriteFile("output.txt", []byte(postContent), 0644)
+            if err != nil {
+                log.Fatalf("Failed to write output file: %v", err)
+            }
+        }
+    outputFiles:
+      - "output.txt"
+    commands:
+      - go run main.go
+    env:
+      KESTRA_RELEASES_BODY: "{{ outputs.fetch_kestra_github_api.body }}"
+
+  - id: log_kestra_latest_update
+    type: io.kestra.plugin.core.log.Log
+    message: "{{ read(outputs.fetch_kestra_latest_updates.outputFiles['output.txt']) }}"
+
+  - id: send_slack_latest_update
+    type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
+    url: "{{ inputs.slack_webhook_uri }}"
+    payload: |
+      {
+        "channel": "#random",
+        "text": "New Kestra update available: {{ read(outputs.fetch_kestra_latest_updates.outputFiles['output.txt']) }}"
+      }
+
+  - id: send_email_notifications
+    type: io.kestra.plugin.notifications.mail.MailSend
+    from: afzal442@gmail.com
+    to: "{{ inputs.recipients }}"
+    subject: "New Kestra Release Available!"
+    htmlTextContent: |
+      Hi there,
+
+      A new Kestra release is available! Here are the details:
+      {{ read(outputs.fetch_kestra_latest_updates.outputFiles['output.txt']) }}
+
+      Best regards,
+      The Kestra Team
+
+  - id: log
+    type: io.kestra.plugin.core.log.Log
+    message: "Process completed. Slack and email notifications sent."
+    
+errors:
+  - id: server_unreachable
+    type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
+    url: "{{ inputs.slack_webhook_uri }}"
+    payload: |
+      {
+        "channel": "#alerts",
+        "text": "The server {{ inputs.server_uri }} is unreachable!"
+      }
+    
+triggers:
+  - id: daily
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 9 * * *"
+    description: "Run daily to fetch Kestra updates and send notifications."
