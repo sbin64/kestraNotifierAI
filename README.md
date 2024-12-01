@@ -2,6 +2,7 @@
 
 Social Media Outreach and Wikisearch AI Workflow leverages Kestra's powerful workflow pipeline to automate and optimize social media outreach and wiki-based search tasks. Using AI, it streamlines the process of gathering, analysing, and sharing content across social media platforms while efficiently retrieving relevant information from wikis, enhancing engagement and content discovery.
 
+![alt text](image.png)
 ![alt text](images/image.png)
 
 
