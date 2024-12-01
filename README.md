@@ -43,6 +43,8 @@ Social Media Outreach and Wikisearch AI Workflow leverages Kestra's powerful wor
 3. Run Kestra Workflow: Ensure that the necessary environment variables are set in .env (API keys and secrets), then run the bot server:
 The Kestra Workflow server will run on port 8080.
 
+![alt text](image-4.png)
+
 ![alt text](image-1.png)
 
 
