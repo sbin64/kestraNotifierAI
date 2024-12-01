@@ -22,7 +22,7 @@ import (
 func GeneratePost(c *gofr.Context, updates string) string {
 	// Initialize GEMINI AI client
 	ctx := context.Background()
-	client, err := genai.NewClient(ctx, option.WithAPIKey("AIzaSyCQ3ydBpXtZqdKaFMQZP5rkSJW6hgy4Cvk"))
+	client, err := genai.NewClient(ctx, option.WithAPIKey(""))
 	if err != nil {
 		c.Errorf("Failed to create GEMINI client: %v", err)
 	}
