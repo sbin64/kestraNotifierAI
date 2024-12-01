@@ -36,11 +36,3 @@ jobs:
           directory: ./kestra/flows
           resource: flow
           server: https://f634-4-240-39-195.ngrok-free.app
-
-      - name: Deploy engineering flows
-        uses: kestra-io/deploy-action@master
-        with:
-          namespace: kestra.aiops
-          directory: ./kestra/flows/engineering
-          resource: flow
-          server: https://f634-4-240-39-195.ngrok-free.app
