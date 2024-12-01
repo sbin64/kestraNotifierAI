@@ -1,0 +1,19 @@
+id: push_to_git
+namespace: kestra.aiops
+
+tasks:
+  - id: commit_and_push
+    type: io.kestra.plugin.git.PushFlows
+    username: sbin64
+    password: "{{ kv('GITHUB_ACCESS_TOKEN') }}"
+    url: https://github.com/sbin64/kestraNotifierAI
+    branch: develop
+    targetNamespace: kestra.aiops
+    gitDirectory: kestra/flows
+    commitMessage: "push all flows of kestra.aiops ns"
+    includeChildNamespaces: true
+
+triggers:
+  - id: schedule_push
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 17 * * *" # release/push to Git every day at 5pm
