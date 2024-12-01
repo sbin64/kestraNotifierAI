@@ -8,13 +8,16 @@ inputs:
     defaults: https://kestra.io
   - id: slack_webhook_uri
     type: URI
-    defaults: "{{kv('SLACK_WEBHOOK')}}"
+    defaults: "{{ kv('SLACK_WEBHOOK_URI') }}"
   - id: recipients
     type: STRING
     defaults: ["afvn.in@gmail.com"]
   - id: api_url
     type: URI
     defaults: https://api.github.com/repos/kestra-io/kestra/releases/latest
+  - id: gen_ai_api_key 
+    type: STRING
+    defaults: "{{ kv('GEMINI_API_KEY') }}"
 
 tasks:
   - id: fetch_kestra_github_api
@@ -60,8 +63,8 @@ tasks:
 
             // Format the release information
             kestra := release
-            postContent := fmt.Sprintf("Latest Kestra Release:\nTag: %s\nName: %s\nPublished: %s\n\n%s",
-                kestra.TagName, kestra.Name, kestra.PublishedAt, kestra.Body)
+            postContent := fmt.Sprintf("Latest Kestra Release:\nTag: %s\nName: %s\nDetails:\n%s",
+                kestra.TagName, kestra.Name, kestra.Body)
 
             // Write to output file
             err = os.WriteFile("output.txt", []byte(postContent), 0644)
@@ -79,6 +82,52 @@ tasks:
   - id: log_kestra_latest_update
     type: io.kestra.plugin.core.log.Log
     message: "{{ read(outputs.fetch_kestra_latest_updates.outputFiles['output.txt']) }}"
+  
+  - id: generate_twitter_post
+    type: io.kestra.plugin.scripts.shell.Commands
+    taskRunner:
+      type: io.kestra.plugin.scripts.runner.docker.Docker
+    containerImage: golang:latest
+    inputFiles:
+      main.go: |
+        package main
+
+        import (
+            "fmt"
+            "io/ioutil"
+            "log"
+            "os"
+            "github.com/google/generative-ai-go/genai"
+        )
+
+        func main() {
+            // Read the Kestra update content
+            content, err := ioutil.ReadFile("output.txt")
+            if err != nil {
+                log.Fatalf("Failed to read output file: %v", err)
+            }
+
+            // Use Generative AI to create a Twitter post
+            client := genai.NewClient(os.Getenv("GEN_AI_API_KEY"))
+            prompt := fmt.Sprintf("Write a concise and engaging Twitter post for the following:\n%s", string(content))
+            response, err := client.GenerateText(prompt)
+            if err != nil {
+                log.Fatalf("Failed to generate text: %v", err)
+            }
+
+            // Write the generated post to an output file
+            err = ioutil.WriteFile("twitter_post.txt", []byte(response.Text), 0644)
+            if err != nil {
+                log.Fatalf("Failed to write Twitter post file: %v", err)
+            }
+        }
+    outputFiles:
+      - "twitter_post.txt"
+    commands:
+      - go install github.com/google/generative-ai-go/genai@latest
+      - go run main.go
+    env:
+      GEN_AI_API_KEY: "{{ (inputs.gen_ai_api_key) }}"
 
   - id: send_slack_latest_update
     type: io.kestra.plugin.notifications.slack.SlackIncomingWebhook
