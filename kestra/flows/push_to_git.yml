@@ -1,5 +1,5 @@
 id: push_to_git
-namespace: prod
+namespace: kestra.aiops
 
 tasks:
   - id: commit_and_push
@@ -8,8 +8,7 @@ tasks:
     password: "{{ kv('GITHUB_ACCESS_TOKEN') }}"
     url: https://github.com/sbin64/kestraNotifierAI
     branch: develop
-    # sourcenamespace: kestra.aiops
-    targetNamespace: prod
+    targetNamespace: kestra.aiops
     gitDirectory: kestra/flows
     commitMessage: "push all flows of kestra.aiops ns"
     includeChildNamespaces: true

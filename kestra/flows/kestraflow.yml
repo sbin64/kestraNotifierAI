@@ -1,5 +1,5 @@
 id: kestraflow
-namespace: prod
+namespace: kestra.aiops
 tasks:
   - id: go
     type: io.kestra.plugin.scripts.shell.Commands
