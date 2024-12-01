@@ -1,0 +1,38 @@
+name: Kestra CI/CD
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main", "deploy"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Kestra validate
+    steps:
+      - name: Checkout repo content
+        uses: actions/checkout@v4
+
+      - name: Validate all flows on server-side
+        uses: kestra-io/validate-action@develop
+        with:
+          directory: ./kestra/flows
+          resource: flow
+          server: https://6fb3-4-240-39-195.ngrok-free.app
+
+  # If validation passed, deploy resources
+  deploy:
+    runs-on: ubuntu-latest
+    name: Kestra deploy
+    steps:
+      # We can only deploy to one namespace at once,
+      - name: Checkout repo content
+        uses: actions/checkout@v4
+
+      - name: Deploy your aiops flows
+        uses: kestra-io/deploy-action@master
+        with:
+          namespace: kestra.aiops
+          directory: ./kestra/flows
+          resource: flow
+          server: https://6fb3-4-240-39-195.ngrok-free.app
