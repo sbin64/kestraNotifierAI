@@ -13,3 +13,8 @@ tasks:
     gitDirectory: kestraNotifierAI
     commitMessage: "push all flows of kestra.aiops ns"
     includeChildNamespaces: true
+
+triggers:
+  - id: schedule_push
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "0 17 * * *" # release/push to Git every day at 5pm
